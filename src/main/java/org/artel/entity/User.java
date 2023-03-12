@@ -4,11 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 
-@Entity
-@Table(name = "art_user")
 @Getter
 @Setter
+@Entity
+@Table(name = "art_user")
 public class User /*implements UserDetails*/ {
 
     @Id
@@ -16,12 +17,26 @@ public class User /*implements UserDetails*/ {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "username", unique = true)
+    @Column(name = "username")
     private String username;
-//    @Size(min = 6)
+
     @Column(name = "password")
     private String password;
 
+    @Email
+    @Column
+    private String email;
+    //    @Pattern
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+/*    @ManyToOne
+    @JoinColumn(name = "user_type")
+    private UserType userType;
+
+    @ManyToOne
+    @JoinColumn(name = "person_type")
+    private PersonType personType;*/
 /*    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
