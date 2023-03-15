@@ -18,4 +18,10 @@ public class Customer {
 
     @Column(name = "user_id")
     private Long userId;
+
+    @OneToOne(cascade = {CascadeType.ALL}, mappedBy = "contractor")
+    private LegalPerson legalPerson;
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "contractor")
+    private NaturalPerson naturalPerson;
 }

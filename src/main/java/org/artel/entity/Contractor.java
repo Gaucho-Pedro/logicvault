@@ -1,5 +1,6 @@
 package org.artel.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Table(name = "art_contractor")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Contractor {
 
     @Id
@@ -19,11 +21,9 @@ public class Contractor {
     @Column(name = "user_id")
     private Long userId;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id", referencedColumnName = "contractor_id")
+    @OneToOne(cascade = {CascadeType.ALL}, mappedBy = "contractor")
     private LegalPerson legalPerson;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id", referencedColumnName = "contractor_id")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "contractor")
     private NaturalPerson naturalPerson;
 }

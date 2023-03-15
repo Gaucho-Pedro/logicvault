@@ -2,6 +2,8 @@ package org.artel.service;
 
 import lombok.RequiredArgsConstructor;
 import org.artel.entity.Customer;
+import org.artel.entity.LegalPerson;
+import org.artel.entity.NaturalPerson;
 import org.artel.entity.User;
 import org.artel.repository.CustomerRepository;
 import org.artel.repository.UserRepository;
@@ -23,11 +25,20 @@ public class CustomerService {
     public List<Customer> getCustomers() {
         return customerRepository.findAll();
     }
+
+    public List<Customer> getContractorsWhichAreLegalPerson() {
+        return customerRepository.findByLegalPersonNotNullAndNaturalPersonNull();
+    }
+
+    public List<Customer> getContractorsWhichAreNaturalPerson() {
+        return customerRepository.findByNaturalPersonNotNullAndLegalPersonNull();
+    }
+
     public User createCustomer(User user) {
 //        Optional<User> byUsernameOrEmail = userRepository.findByUsernameOrEmail(user.getUsername(), user.getEmail());
         Optional<User> byUsernameOrEmail = userRepository.findByUsername(user.getUsername());
         if (byUsernameOrEmail.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Такой пользователь уже есть");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Username: " + user.getUsername() + " is already exist");
         } else {
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             user = userRepository.save(user);
@@ -38,4 +49,23 @@ public class CustomerService {
         }
     }
 
+    public Customer registerAsLegalPersonByCustomerId(Long id, LegalPerson legalPerson) {
+        Customer customer = customerRepository.findById(id).orElseThrow();
+        if (customer.getNaturalPerson() != null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a natural entity");
+        }
+        legalPerson.setCustomer(customer);
+        customer.setLegalPerson(legalPerson);
+        return customerRepository.saveAndFlush(customer);
+    }
+
+    public Customer registerAsNaturalPersonByCustomerId(Long id, NaturalPerson naturalPerson) {
+        Customer customer = customerRepository.findById(id).orElseThrow();
+        if (customer.getLegalPerson() != null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a legal entity");
+        }
+        naturalPerson.setCustomer(customer);
+        customer.setNaturalPerson(naturalPerson);
+        return customerRepository.saveAndFlush(customer);
+    }
 }
