@@ -6,66 +6,74 @@ import org.artel.entity.LegalPerson;
 import org.artel.entity.NaturalPerson;
 import org.artel.entity.User;
 import org.artel.repository.CustomerRepository;
-import org.artel.repository.UserRepository;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
+
+    private final UserService userService;
     private final CustomerRepository customerRepository;
-    private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public List<Customer> getCustomers() {
         return customerRepository.findAll();
     }
 
-    public List<Customer> getContractorsWhichAreLegalPerson() {
+    public List<Customer> getCustomersWhichAreLegalPerson() {
         return customerRepository.findByLegalPersonNotNullAndNaturalPersonNull();
     }
 
-    public List<Customer> getContractorsWhichAreNaturalPerson() {
+    public List<Customer> getCustomersWhichAreNaturalPerson() {
         return customerRepository.findByNaturalPersonNotNullAndLegalPersonNull();
     }
 
-    public User createCustomer(User user) {
-//        Optional<User> byUsernameOrEmail = userRepository.findByUsernameOrEmail(user.getUsername(), user.getEmail());
-        Optional<User> byUsernameOrEmail = userRepository.findByUsername(user.getUsername());
-        if (byUsernameOrEmail.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Username: " + user.getUsername() + " is already exist");
-        } else {
-            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            user = userRepository.save(user);
+    public Customer findById(Long id) {
+        return customerRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer with id " + id + " not found"));
+    }
+
+    public Customer findByUserId(Long userId) {
+        return customerRepository.findByUserId(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer with userId " + userId + " not found"));
+    }
+
+    public User createCustomer(User newUser) {
+        if (userService.findByUsername(newUser.getUsername()) != null) {
+            User user = userService.addUser(newUser);
             Customer customer = new Customer();
             customer.setUserId(user.getId());
             customerRepository.save(customer);
-            return user;
+            return newUser;
+        } else {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Username: " + newUser.getUsername() + " is already exist");
         }
     }
 
-    public Customer registerAsLegalPersonByCustomerId(Long id, LegalPerson legalPerson) {
-        Customer customer = customerRepository.findById(id).orElseThrow();
+    public boolean signInCustomer(User user) {
+        User byUsername = userService.findByUsername(user.getUsername());
+        findByUserId(byUsername.getId());
+        return userService.signIn(user.getPassword(),byUsername.getPassword());
+    }
+
+    public Customer setLegalStatus(Long id, LegalPerson legalPerson) {
+        Customer customer = findById(id);
         if (customer.getNaturalPerson() != null) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a natural entity");
         }
         legalPerson.setCustomer(customer);
         customer.setLegalPerson(legalPerson);
-        return customerRepository.saveAndFlush(customer);
+        return customerRepository.save(customer);
     }
 
-    public Customer registerAsNaturalPersonByCustomerId(Long id, NaturalPerson naturalPerson) {
-        Customer customer = customerRepository.findById(id).orElseThrow();
+    public Customer setNaturalStatus(Long id, NaturalPerson naturalPerson) {
+        Customer customer = findById(id);
         if (customer.getLegalPerson() != null) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a legal entity");
         }
         naturalPerson.setCustomer(customer);
         customer.setNaturalPerson(naturalPerson);
-        return customerRepository.saveAndFlush(customer);
+        return customerRepository.save(customer);
     }
 }

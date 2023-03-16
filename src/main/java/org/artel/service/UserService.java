@@ -21,9 +21,20 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public boolean signIn(User user) {
-        User user1 = userRepository.findByUsername(user.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return bCryptPasswordEncoder.matches(user.getPassword(), user1.getPassword());
+    public User findById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id " + id + " not found"));
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username " + username + " not found"));
+    }
+
+    public User addUser(User newUser) {
+        newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
+        return userRepository.save(newUser);
+    }
+
+    public boolean signIn(String rawPassword, String encodedPassword) {
+        return bCryptPasswordEncoder.matches(rawPassword, encodedPassword);
     }
 }

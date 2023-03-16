@@ -16,18 +16,18 @@ import java.util.List;
 public class AuthController {
     private final UserService userService;
 
-    @GetMapping
-    public List<User> getUsers() {
-        return userService.getUsers();
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<?> createUser(@Valid @RequestBody User user) {
-        return new ResponseEntity<>(userService.createUser(user), HttpStatus.CREATED);
-    }
-
-    @PostMapping("/signIn")
-    public ResponseEntity<?> signIn(@Valid @RequestBody User user) {
-        return userService.signIn(user) ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    }
+//    @GetMapping
+//    public List<User> getUsers() {
+//        return userService.getUsers();
+//    }
+//
+//    @PostMapping("/register")
+//    public ResponseEntity<?> createUser(@Valid @RequestBody User user) {
+//        return new ResponseEntity<>(userService.addUser(user), HttpStatus.CREATED);
+//    }
+//
+//    @PostMapping("/signIn")
+//    public ResponseEntity<?> signIn(@Valid @RequestBody User user) {
+//        return userService.signIn(user) ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//    }
 }

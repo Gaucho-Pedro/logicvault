@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Table(name = "art_contractor")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Contractor {
 
     @Id
