@@ -1,6 +1,8 @@
 package org.artel.controller;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.artel.entity.Contractor;
 import org.artel.entity.LegalPerson;
 import org.artel.entity.NaturalPerson;
@@ -16,9 +18,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/contractor")
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ContractorController {
 
-    private final ContractorService contractorService;
+    ContractorService contractorService;
 
     @GetMapping
     public List<Contractor> getContractors() {

@@ -1,6 +1,5 @@
 package org.artel.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,7 +28,7 @@ public class LegalPerson {
     @Column(name = "legal_address", columnDefinition = "TEXT")
     private String legalAddress;
 
-    @JsonIgnore
+/*    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "contractor_id", referencedColumnName = "id")
     private Contractor contractor;
@@ -37,5 +36,5 @@ public class LegalPerson {
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
-    private Customer customer;
+    private Customer customer;*/
 }

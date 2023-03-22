@@ -1,6 +1,5 @@
 package org.artel.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,9 +20,11 @@ public class Contractor {
     @Column(name = "user_id")
     private Long userId;
 
-    @OneToOne(cascade = {CascadeType.ALL}, mappedBy = "contractor")
+    @OneToOne(cascade = {CascadeType.ALL}/*, mappedBy = "contractor"*/)
+    @JoinColumn(name = "legal_person_id", referencedColumnName = "id")
     private LegalPerson legalPerson;
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "contractor")
+    @OneToOne(cascade = CascadeType.ALL/*, mappedBy = "contractor"*/)
+    @JoinColumn(name = "natural_person_id", referencedColumnName = "id")
     private NaturalPerson naturalPerson;
 }

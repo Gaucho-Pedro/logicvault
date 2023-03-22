@@ -1,11 +1,15 @@
 package org.artel.controller;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.artel.dto.CustomerDto;
 import org.artel.entity.Customer;
 import org.artel.entity.LegalPerson;
 import org.artel.entity.NaturalPerson;
 import org.artel.entity.User;
 import org.artel.service.CustomerService;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +20,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/customer")
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class CustomerController {
 
-    private final CustomerService customerService;
+    CustomerService customerService;
+    ModelMapper modelMapper;
 
     @GetMapping("/{id}")
     public Customer getCustomerById(@PathVariable("id") Long id) {
@@ -36,24 +42,32 @@ public class CustomerController {
     }
 
     @PostMapping("/{id}/legal")
-    public Customer setLegalStatus(@PathVariable("id") Long id,
-                                   @Valid @RequestBody LegalPerson legalPerson) {
-        return customerService.setLegalStatus(id, legalPerson);
+    public CustomerDto setLegalStatus(@PathVariable("id") Long id,
+                                      @Valid @RequestBody LegalPerson legalPerson) {
+        return modelMapper.map(customerService.setLegalStatus(id, legalPerson), CustomerDto.class);
     }
 
     @PostMapping("/{id}/natural")
-    public Customer setNaturalStatus(@PathVariable("id") Long id,
-                                     @Valid @RequestBody NaturalPerson naturalPerson) {
-        return customerService.setNaturalStatus(id, naturalPerson);
+    public CustomerDto setNaturalStatus(@PathVariable("id") Long id,
+                                        @Valid @RequestBody NaturalPerson naturalPerson) {
+        return modelMapper.map(customerService.setNaturalStatus(id, naturalPerson), CustomerDto.class);
     }
 
     @PostMapping("/auth/register")
     public ResponseEntity<?> createCustomer(@Valid @RequestBody User user) {
-        return new ResponseEntity<>(customerService.createCustomer(user), HttpStatus.CREATED);
+        Object result = customerService.createCustomer(user);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
+//        return new ResponseEntity<>(modelMapper.map(customerService.createCustomer(user), CustomerDto.class), HttpStatus.CREATED);
     }
 
     @PostMapping("/auth/signIn")
     public ResponseEntity<?> signIn(@Valid @RequestBody User user) {
         return customerService.signInCustomer(user) ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable("id") Long id) {
+        customerService.deleteCustomerById(id);
+    }
+
 }

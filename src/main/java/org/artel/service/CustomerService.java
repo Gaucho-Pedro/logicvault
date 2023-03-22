@@ -1,6 +1,9 @@
 package org.artel.service;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.artel.entity.Customer;
 import org.artel.entity.LegalPerson;
 import org.artel.entity.NaturalPerson;
@@ -12,12 +15,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class CustomerService {
 
-    private final UserService userService;
-    private final CustomerRepository customerRepository;
+    UserService userService;
+    CustomerRepository customerRepository;
 
     public List<Customer> getCustomers() {
         return customerRepository.findAll();
@@ -40,29 +45,32 @@ public class CustomerService {
     }
 
     public User createCustomer(User newUser) {
-        if (userService.findByUsername(newUser.getUsername()) != null) {
-            User user = userService.addUser(newUser);
-            Customer customer = new Customer();
-            customer.setUserId(user.getId());
-            customerRepository.save(customer);
-            return newUser;
-        } else {
+        if (userService.findByUsername(newUser.getUsername()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Username: " + newUser.getUsername() + " is already exist");
         }
+        var user = userService.addUser(newUser);
+        Customer customer = new Customer();
+        customer.setUser(user);
+        customerRepository.save(customer);
+        return newUser;
     }
 
     public boolean signInCustomer(User user) {
-        User byUsername = userService.findByUsername(user.getUsername());
+        User byUsername = userService.findByUsername(user.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username " + user.getUsername() + " not found"));
         findByUserId(byUsername.getId());
-        return userService.signIn(user.getPassword(),byUsername.getPassword());
+        return userService.signIn(user.getPassword(), byUsername.getPassword());
     }
 
     public Customer setLegalStatus(Long id, LegalPerson legalPerson) {
         Customer customer = findById(id);
         if (customer.getNaturalPerson() != null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a natural entity");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a natural person");
         }
-        legalPerson.setCustomer(customer);
+        if (customer.getLegalPerson() != null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a legal person");
+        }
+//        legalPerson.setCustomer(customer);
         customer.setLegalPerson(legalPerson);
         return customerRepository.save(customer);
     }
@@ -70,10 +78,16 @@ public class CustomerService {
     public Customer setNaturalStatus(Long id, NaturalPerson naturalPerson) {
         Customer customer = findById(id);
         if (customer.getLegalPerson() != null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a legal entity");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a legal person");
         }
-        naturalPerson.setCustomer(customer);
+        if (customer.getNaturalPerson() != null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a natural person");
+        }
+//        naturalPerson.setCustomer(customer);
         customer.setNaturalPerson(naturalPerson);
         return customerRepository.save(customer);
+    }
+    public void deleteCustomerById(Long id){
+        customerRepository.deleteById(id);
     }
 }

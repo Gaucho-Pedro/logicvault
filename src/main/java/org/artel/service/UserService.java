@@ -1,6 +1,8 @@
 package org.artel.service;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.artel.entity.User;
 import org.artel.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -9,13 +11,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    UserRepository userRepository;
+    BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public List<User> getUsers() {
         return userRepository.findAll();
@@ -25,8 +29,8 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id " + id + " not found"));
     }
 
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username " + username + " not found"));
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
     public User addUser(User newUser) {

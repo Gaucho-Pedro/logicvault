@@ -1,6 +1,5 @@
 package org.artel.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,9 +23,9 @@ public class NaturalPerson {
     private String citizenship;
 
     @Column(name = "passport_data", columnDefinition = "TEXT")
-    private String passport_data;
+    private String passportData;
 
-    @JsonIgnore
+/*    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "contractor_id", referencedColumnName = "id")
     private Contractor contractor;
@@ -34,5 +33,5 @@ public class NaturalPerson {
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
-    private Customer customer;
+    private Customer customer;*/
 }
