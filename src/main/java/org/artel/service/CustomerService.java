@@ -44,15 +44,14 @@ public class CustomerService {
         return customerRepository.findByUserId(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer with userId " + userId + " not found"));
     }
 
-    public User createCustomer(User newUser) {
+    public Customer createCustomer(User newUser) {
         if (userService.findByUsername(newUser.getUsername()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Username: " + newUser.getUsername() + " is already exist");
         }
         var user = userService.addUser(newUser);
         Customer customer = new Customer();
         customer.setUser(user);
-        customerRepository.save(customer);
-        return newUser;
+        return customerRepository.save(customer);
     }
 
     public boolean signInCustomer(User user) {

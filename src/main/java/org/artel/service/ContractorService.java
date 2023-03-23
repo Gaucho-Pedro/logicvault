@@ -18,7 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ContractorService {
-
     UserService userService;
     ContractorRepository contractorRepository;
 
@@ -42,15 +41,14 @@ public class ContractorService {
         return contractorRepository.findByUserId(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contractor with userId " + userId + " not found"));
     }
 
-    public User createContractor(User newUser) {
+    public Contractor createContractor(User newUser) {
         if (userService.findByUsername(newUser.getUsername()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Username: " + newUser.getUsername() + " is already exist");
         }
         var user = userService.addUser(newUser);
         Contractor contractor = new Contractor();
-        contractor.setUserId(user.getId());
-        contractorRepository.save(contractor);
-        return newUser;
+        contractor.setUser(user);
+        return contractorRepository.save(contractor);
     }
 
     public boolean signInContractor(User user) {
@@ -63,7 +61,10 @@ public class ContractorService {
     public Contractor setLegalStatus(Long id, LegalPerson legalPerson) {
         Contractor contractor = findById(id);
         if (contractor.getNaturalPerson() != null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Contractor with id: " + id + " is already a natural entity");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Contractor with id: " + id + " is already a natural person");
+        }
+        if (contractor.getLegalPerson() != null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Contractor with id: " + id + " is already a legal person");
         }
 //        legalPerson.setContractor(contractor);
         contractor.setLegalPerson(legalPerson);
@@ -73,10 +74,16 @@ public class ContractorService {
     public Contractor setNaturalStatus(Long id, NaturalPerson naturalPerson) {
         Contractor contractor = findById(id);
         if (contractor.getLegalPerson() != null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Contractor with id: " + id + " is already a legal entity");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Contractor with id: " + id + " is already a legal person");
+        }
+        if (contractor.getNaturalPerson() != null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Contractor with id: " + id + " is already a natural person");
         }
 //        naturalPerson.setContractor(contractor);
         contractor.setNaturalPerson(naturalPerson);
         return contractorRepository.save(contractor);
+    }
+    public void deleteContractorById(Long id){
+        contractorRepository.deleteById(id);
     }
 }

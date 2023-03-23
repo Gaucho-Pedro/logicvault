@@ -1,5 +1,6 @@
 package org.artel.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +11,7 @@ import javax.validation.constraints.Email;
 @Setter
 @Entity
 @Table(name = "art_user")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User /*implements UserDetails*/ {
 
     @Id

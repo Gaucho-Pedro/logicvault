@@ -18,8 +18,8 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/customer")
 @RequiredArgsConstructor
+@RequestMapping("/customer")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class CustomerController {
 
@@ -54,10 +54,8 @@ public class CustomerController {
     }
 
     @PostMapping("/auth/register")
-    public ResponseEntity<?> createCustomer(@Valid @RequestBody User user) {
-        Object result = customerService.createCustomer(user);
-        return new ResponseEntity<>(result, HttpStatus.CREATED);
-//        return new ResponseEntity<>(modelMapper.map(customerService.createCustomer(user), CustomerDto.class), HttpStatus.CREATED);
+    public ResponseEntity<CustomerDto> createCustomer(@Valid @RequestBody User user) {
+        return new ResponseEntity<>(modelMapper.map(customerService.createCustomer(user), CustomerDto.class), HttpStatus.CREATED);
     }
 
     @PostMapping("/auth/signIn")
@@ -69,5 +67,4 @@ public class CustomerController {
     public void deleteById(@PathVariable("id") Long id) {
         customerService.deleteCustomerById(id);
     }
-
 }

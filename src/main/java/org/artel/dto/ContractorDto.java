@@ -5,7 +5,7 @@ import org.artel.entity.LegalPerson;
 import org.artel.entity.NaturalPerson;
 
 @Data
-public class CustomerDto {
+public class ContractorDto {
 
     private Long id;
     private Long userId;

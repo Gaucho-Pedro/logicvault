@@ -17,8 +17,9 @@ public class Contractor {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @OneToOne(cascade = {CascadeType.ALL}/*, mappedBy = "contractor"*/)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
     @OneToOne(cascade = {CascadeType.ALL}/*, mappedBy = "contractor"*/)
     @JoinColumn(name = "legal_person_id", referencedColumnName = "id")

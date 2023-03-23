@@ -33,14 +33,14 @@ create table art_legal_person
 create table art_contractor
 (
     id                bigint generated always as identity primary key,
-    user_id           bigint references art_user (id) not null,
+    user_id           bigint references art_user (id) on delete cascade not null,
     natural_person_id bigint references art_natural_person (id),
     legal_person_id   bigint references art_legal_person (id)
 );
 create table art_customer
 (
     id                bigint generated always as identity primary key,
-    user_id           bigint references art_user (id) not null,
+    user_id           bigint references art_user (id) on delete cascade not null,
     natural_person_id bigint references art_natural_person (id),
     legal_person_id   bigint references art_legal_person (id)
 );
