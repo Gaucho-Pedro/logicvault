@@ -4,10 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.artel.dto.CustomerDto;
-import org.artel.entity.Customer;
-import org.artel.entity.LegalPerson;
-import org.artel.entity.NaturalPerson;
-import org.artel.entity.User;
+import org.artel.entity.*;
 import org.artel.service.CustomerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -16,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -66,5 +64,15 @@ public class CustomerController {
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable("id") Long id) {
         customerService.deleteCustomerById(id);
+    }
+
+//    @PostMapping("/{id}/portfolio")
+//    public ResponseEntity<Customer> createPortfolio(@PathVariable("id") Long id, @RequestBody Portfolio portfolio) {
+//        return ResponseEntity.ok(customerService.createPortfolioForCustomerById(portfolio, id));
+//    }
+
+    @GetMapping("/{id}/portfolios")
+    public ResponseEntity<Set<Portfolio>> getPortfoliosForCustomerById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(customerService.getPortfoliosForCustomerById(id));
     }
 }

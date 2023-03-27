@@ -4,16 +4,14 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.artel.entity.Customer;
-import org.artel.entity.LegalPerson;
-import org.artel.entity.NaturalPerson;
-import org.artel.entity.User;
+import org.artel.entity.*;
 import org.artel.repository.CustomerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -22,6 +20,7 @@ import java.util.List;
 public class CustomerService {
 
     UserService userService;
+    //    PortfolioService portfolioService;
     CustomerRepository customerRepository;
 
     public List<Customer> getCustomers() {
@@ -86,7 +85,18 @@ public class CustomerService {
         customer.setNaturalPerson(naturalPerson);
         return customerRepository.save(customer);
     }
-    public void deleteCustomerById(Long id){
+
+//    public Customer createPortfolioForCustomerById(Portfolio portfolio, Long customerId) {
+//        Customer customer = findById(customerId);
+//        customer.getPortfolios().add(portfolioService.createPortfolio(portfolio));
+//        return customerRepository.save(customer);
+//    }
+
+    public Set<Portfolio> getPortfoliosForCustomerById(Long customerId) {
+        return findById(customerId).getPortfolios();
+    }
+
+    public void deleteCustomerById(Long id) {
         customerRepository.deleteById(id);
     }
 }

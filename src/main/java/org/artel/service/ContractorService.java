@@ -18,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ContractorService {
+
     UserService userService;
     ContractorRepository contractorRepository;
 
@@ -83,7 +84,8 @@ public class ContractorService {
         contractor.setNaturalPerson(naturalPerson);
         return contractorRepository.save(contractor);
     }
-    public void deleteContractorById(Long id){
+
+    public void deleteContractorById(Long id) {
         contractorRepository.deleteById(id);
     }
 }
