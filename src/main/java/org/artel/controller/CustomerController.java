@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.artel.dto.CustomerDto;
 import org.artel.entity.*;
 import org.artel.service.CustomerService;
-import org.modelmapper.ModelMapper;
+import org.artel.util.MappingUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,12 @@ import java.util.Set;
 public class CustomerController {
 
     CustomerService customerService;
-    ModelMapper modelMapper;
+    MappingUtil mappingUtil;
+
+    @GetMapping
+    public ResponseEntity<List<CustomerDto>> getCustomers() {
+        return ResponseEntity.ok(mappingUtil.toDtoList(customerService.getCustomers(), CustomerDto.class));
+    }
 
     @GetMapping("/{id}")
     public Customer getCustomerById(@PathVariable("id") Long id) {
@@ -34,26 +39,22 @@ public class CustomerController {
         return customerService.findByUserId(userId);
     }
 
-    @GetMapping
-    public List<Customer> getCustomers() {
-        return customerService.getCustomers();
-    }
 
     @PostMapping("/{id}/legal")
     public CustomerDto setLegalStatus(@PathVariable("id") Long id,
                                       @Valid @RequestBody LegalPerson legalPerson) {
-        return modelMapper.map(customerService.setLegalStatus(id, legalPerson), CustomerDto.class);
+        return mappingUtil.toDto(customerService.setLegalStatus(id, legalPerson), CustomerDto.class);
     }
 
     @PostMapping("/{id}/natural")
     public CustomerDto setNaturalStatus(@PathVariable("id") Long id,
                                         @Valid @RequestBody NaturalPerson naturalPerson) {
-        return modelMapper.map(customerService.setNaturalStatus(id, naturalPerson), CustomerDto.class);
+        return mappingUtil.toDto(customerService.setNaturalStatus(id, naturalPerson), CustomerDto.class);
     }
 
     @PostMapping("/auth/register")
     public ResponseEntity<CustomerDto> createCustomer(@Valid @RequestBody User user) {
-        return new ResponseEntity<>(modelMapper.map(customerService.createCustomer(user), CustomerDto.class), HttpStatus.CREATED);
+        return new ResponseEntity<>(mappingUtil.toDto(customerService.createCustomer(user), CustomerDto.class), HttpStatus.CREATED);
     }
 
     @PostMapping("/auth/signIn")

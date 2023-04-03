@@ -5,8 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-@Configuration
 //@EnableSwagger2
+@Configuration
 public class Config {
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -15,6 +15,20 @@ public class Config {
 
     @Bean
     public ModelMapper modelMapper() {
-        return new ModelMapper();
+        var modelMapper = new ModelMapper();
+        return modelMapper;
     }
+
+/*    @Bean
+    public MappingUtil mappingUtil(ModelMapper modelMapper) {
+        return new MappingUtil(modelMapper);
+    }*/
+//    @Bean
+//    public Docket api() {
+//        return new Docket(DocumentationType.SWAGGER_2)
+//                .select()
+//                .apis(RequestHandlerSelectors.any())
+//                .paths(PathSelectors.any())
+//                .build();
+//    }
 }

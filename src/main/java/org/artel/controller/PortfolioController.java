@@ -3,11 +3,15 @@ package org.artel.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.artel.dto.PortfolioDto;
 import org.artel.entity.Portfolio;
 import org.artel.service.PortfolioService;
+import org.artel.util.MappingUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class PortfolioController {
 
     PortfolioService portfolioService;
+    MappingUtil mappingUtil;
 
     @PostMapping("/customer/{id}")
     public ResponseEntity<Portfolio> createPortfolioForCustomerById(@PathVariable("id") Long id, @RequestBody Portfolio portfolio) {
@@ -25,8 +30,13 @@ public class PortfolioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Portfolio> getPortfolioById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(portfolioService.findById(id));
+    public ResponseEntity<PortfolioDto> getPortfolioById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(mappingUtil.toDto(portfolioService.findById(id), PortfolioDto.class));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PortfolioDto>> getPortfolios() {
+        return ResponseEntity.ok(mappingUtil.toDtoList(portfolioService.getPortfolios(), PortfolioDto.class));
     }
 
     @PutMapping("/{id}")

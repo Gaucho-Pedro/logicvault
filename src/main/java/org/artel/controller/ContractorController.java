@@ -9,7 +9,7 @@ import org.artel.entity.LegalPerson;
 import org.artel.entity.NaturalPerson;
 import org.artel.entity.User;
 import org.artel.service.ContractorService;
-import org.modelmapper.ModelMapper;
+import org.artel.util.MappingUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +24,12 @@ import java.util.List;
 public class ContractorController {
 
     ContractorService contractorService;
-    ModelMapper modelMapper;
+    MappingUtil mappingUtil;
+
+    @GetMapping
+    public ResponseEntity<List<ContractorDto>> getContractors() {
+        return ResponseEntity.ok(mappingUtil.toDtoList(contractorService.getContractors(), ContractorDto.class));
+    }
 
     @GetMapping("/{id}")
     public Contractor getContractorById(@PathVariable("id") Long id) {
@@ -36,26 +41,21 @@ public class ContractorController {
         return contractorService.findByUserId(userId);
     }
 
-    @GetMapping
-    public List<Contractor> getContractors() {
-        return contractorService.getContractors();
-    }
-
     @PostMapping("/{id}/legal")
     public ContractorDto setLegalStatus(@PathVariable("id") Long id,
                                         @Valid @RequestBody LegalPerson legalPerson) {
-        return modelMapper.map(contractorService.setLegalStatus(id, legalPerson), ContractorDto.class);
+        return mappingUtil.toDto(contractorService.setLegalStatus(id, legalPerson), ContractorDto.class);
     }
 
     @PostMapping("/{id}/natural")
     public ContractorDto setNaturalStatus(@PathVariable("id") Long id,
                                           @Valid @RequestBody NaturalPerson naturalPerson) {
-        return modelMapper.map(contractorService.setNaturalStatus(id, naturalPerson), ContractorDto.class);
+        return mappingUtil.toDto(contractorService.setNaturalStatus(id, naturalPerson), ContractorDto.class);
     }
 
     @PostMapping("/auth/register")
     public ResponseEntity<ContractorDto> createContractor(@Valid @RequestBody User user) {
-        return new ResponseEntity<>(modelMapper.map(contractorService.createContractor(user), ContractorDto.class), HttpStatus.CREATED);
+        return new ResponseEntity<>(mappingUtil.toDto(contractorService.createContractor(user), ContractorDto.class), HttpStatus.CREATED);
     }
 
     @PostMapping("/auth/signIn")
