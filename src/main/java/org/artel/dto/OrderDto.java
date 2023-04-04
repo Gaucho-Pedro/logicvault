@@ -4,15 +4,15 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-import java.math.BigInteger;
+import java.time.LocalDate;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LegalPersonDto {
+public class OrderDto {
 
     Long id;
-    String name;
-    BigInteger inn;
-    BigInteger registrationNumber;
-    String legalAddress;
+    Long contractorId;
+    String description;
+    String activityTypeName;
+    LocalDate targetDate;
 }

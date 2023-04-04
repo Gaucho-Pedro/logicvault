@@ -6,10 +6,8 @@ import lombok.experimental.FieldDefaults;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ContractorDto {
+public class SignInDto {
 
-    Long id;
-    Long userId;
-    LegalPersonDto legalPerson;
-    NaturalPersonDto naturalPerson;
+    String username;
+    String password;
 }

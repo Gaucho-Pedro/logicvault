@@ -38,6 +38,27 @@ public class UserService {
         return userRepository.save(newUser);
     }
 
+    public User changeUser(User newUser) {
+        var user = findById(newUser.getId());
+
+        if (newUser.getEmail() != null) {
+            user.setEmail(newUser.getEmail());
+        }
+        if (newUser.getPhoneNumber() != null) {
+            user.setPhoneNumber(newUser.getPhoneNumber());
+        }
+        return userRepository.save(user);
+    }
+
+    public User changePassword(Long userId, String oldPassword, String newPassword) {
+        var user = findById(userId);
+        if (!signIn(user.getPassword(), oldPassword)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Wrong old password");
+        }
+        user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+        return userRepository.save(user);
+    }
+
     public boolean signIn(String rawPassword, String encodedPassword) {
         return bCryptPasswordEncoder.matches(rawPassword, encodedPassword);
     }

@@ -1,11 +1,14 @@
 package org.artel.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -14,28 +17,29 @@ import java.util.Set;
 @Entity
 @Table(name = "art_customer")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Long id;
+    Long id;
 
     @OneToOne(cascade = {CascadeType.ALL}/*, mappedBy = "contractor"*/)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    User user;
 
     @OneToOne(cascade = {CascadeType.ALL}/*, mappedBy = "contractor"*/)
     @JoinColumn(name = "legal_person_id", referencedColumnName = "id")
-    private LegalPerson legalPerson;
+    LegalPerson legalPerson;
 
     @OneToOne(cascade = CascadeType.ALL/*, mappedBy = "contractor"*/)
     @JoinColumn(name = "natural_person_id", referencedColumnName = "id")
-    private NaturalPerson naturalPerson;
+    NaturalPerson naturalPerson;
 
     @OneToMany/*(cascade = CascadeType.ALL)*/
     @JoinColumn(name = "customer_id")
-    private Set<Portfolio> portfolios;
+    Set<Portfolio> portfolios = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

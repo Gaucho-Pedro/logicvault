@@ -1,8 +1,10 @@
 package org.artel.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -13,26 +15,28 @@ import java.util.Objects;
 @Setter
 @Entity
 @Table(name = "art_order")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Order {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Long id;
+    Long id;
 
     @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
+    String description;
 
     @ManyToOne
     @JoinColumn(name = "activity_type_id")
-    private ActivityType activityType;
+    ActivityType activityType;
 
     @Column(name = "target_date")
-    private LocalDate targetDate;
+    LocalDate targetDate;
 
     @ManyToOne
     @JoinColumn(name = "contractor_id")
     @JsonIgnore
-    private Contractor contractor;
+    Contractor contractor;
 
     @Override
     public boolean equals(Object o) {

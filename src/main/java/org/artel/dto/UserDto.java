@@ -4,15 +4,12 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-import java.math.BigInteger;
-
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LegalPersonDto {
+public class UserDto {
 
     Long id;
-    String name;
-    BigInteger inn;
-    BigInteger registrationNumber;
-    String legalAddress;
+    String username;
+    String email;
+    String phoneNumber;
 }

@@ -1,8 +1,10 @@
 package org.artel.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -14,25 +16,26 @@ import java.util.Objects;
 @Entity
 @Table(name = "art_user")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User /*implements UserDetails*/ {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Long id;
+    Long id;
 
     @Column(name = "username")
-    private String username;
+    String username;
 
     @Column(name = "password")
-    private String password;
+    String password;
 
     @Email
     @Column
-    private String email;
+    String email;
     //    @Pattern
     @Column(name = "phone_number")
-    private String phoneNumber;
+    String phoneNumber;
 
 /*    @ManyToOne
     @JoinColumn(name = "user_type")

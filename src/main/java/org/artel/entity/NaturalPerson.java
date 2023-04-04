@@ -1,7 +1,9 @@
 package org.artel.entity;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -11,21 +13,22 @@ import java.util.Objects;
 @Setter
 @Entity
 @Table(name = "art_natural_person")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class NaturalPerson {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Long id;
+    Long id;
 
     @Column(name = "full_name")
-    private String fullName;
+    String fullName;
 
     @Column(name = "citizenship")
-    private String citizenship;
+    String citizenship;
 
     @Column(name = "passport_data", columnDefinition = "TEXT")
-    private String passportData;
+    String passportData;
 
 /*    @JsonIgnore
     @OneToOne

@@ -23,8 +23,8 @@ create table if not exists art_legal_person
 (
     id                  bigint generated always as identity primary key,
     name                varchar,
-    inn                 varchar,
-    registration_number varchar(15),
+    inn                 numeric(12),
+    registration_number numeric(15),
     legal_address       text/*,
     contractor_id       bigint unique references art_contractor (id) on delete cascade,
     customer_id         bigint unique references art_customer (id) on delete cascade,
@@ -44,6 +44,22 @@ create table if not exists art_customer
     user_id           bigint references art_user (id) on delete cascade not null,
     natural_person_id bigint references art_natural_person (id),
     legal_person_id   bigint references art_legal_person (id)
+);
+--- Справочники
+create table if not exists art_activity_type
+(
+    id   bigint generated always as identity primary key,
+    name varchar(100)
+);
+/*create table if not exists art_portfolio_activity
+(
+    portfolio_id bigint references art_portfolio (id),
+    activity_id  bigint references art_activity_type (id)
+);*/
+create table if not exists art_software
+(
+    id   bigint generated always as identity primary key,
+    name varchar(100)
 );
 ---
 create table if not exists art_portfolio
@@ -66,25 +82,9 @@ create table if not exists art_order
     description      text,
     target_date      date
 );
---- Справочники
-create table if not exists art_activity_type
-(
-    id   bigint generated always as identity primary key,
-    name varchar(100)
-);
-/*create table if not exists art_portfolio_activity
-(
-    portfolio_id bigint references art_portfolio (id),
-    activity_id  bigint references art_activity_type (id)
-);*/
-create table if not exists art_software
-(
-    id   bigint generated always as identity primary key,
-    name varchar(100)
-);
+---
 create table if not exists art_portfolio_software
 (
     portfolio_id bigint references art_portfolio (id),
     software_id  bigint references art_software (id)
-)
----
+);

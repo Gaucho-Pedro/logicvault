@@ -1,9 +1,11 @@
 package org.artel.controller;
 
+import io.swagger.annotations.Api;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.artel.dto.ContractorDto;
+import org.artel.dto.SignInDto;
 import org.artel.entity.Contractor;
 import org.artel.entity.LegalPerson;
 import org.artel.entity.NaturalPerson;
@@ -21,6 +23,7 @@ import java.util.List;
 @RequestMapping("/contractor")
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Api
 public class ContractorController {
 
     ContractorService contractorService;
@@ -59,8 +62,8 @@ public class ContractorController {
     }
 
     @PostMapping("/auth/signIn")
-    public ResponseEntity<?> signIn(@Valid @RequestBody User user) {
-        return contractorService.signInContractor(user) ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<?> signIn(@Valid @RequestBody SignInDto signInDto) {
+        return contractorService.signInContractor(signInDto) ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @DeleteMapping("/{id}")

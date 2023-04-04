@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.artel.dto.CustomerDto;
+import org.artel.dto.SignInDto;
 import org.artel.entity.*;
 import org.artel.service.CustomerService;
 import org.artel.util.MappingUtil;
@@ -58,8 +59,8 @@ public class CustomerController {
     }
 
     @PostMapping("/auth/signIn")
-    public ResponseEntity<?> signIn(@Valid @RequestBody User user) {
-        return customerService.signInCustomer(user) ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<?> signIn(@Valid @RequestBody SignInDto signInDto) {
+        return customerService.signInCustomer(signInDto) ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @DeleteMapping("/{id}")

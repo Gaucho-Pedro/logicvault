@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.artel.dto.SignInDto;
 import org.artel.entity.*;
 import org.artel.repository.CustomerRepository;
 import org.springframework.http.HttpStatus;
@@ -53,11 +54,11 @@ public class CustomerService {
         return customerRepository.save(customer);
     }
 
-    public boolean signInCustomer(User user) {
-        User byUsername = userService.findByUsername(user.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username " + user.getUsername() + " not found"));
+    public boolean signInCustomer(SignInDto signInDto) {
+        User byUsername = userService.findByUsername(signInDto.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username " + signInDto.getUsername() + " not found"));
         findByUserId(byUsername.getId());
-        return userService.signIn(user.getPassword(), byUsername.getPassword());
+        return userService.signIn(signInDto.getPassword(), byUsername.getPassword());
     }
 
     public Customer setLegalStatus(Long id, LegalPerson legalPerson) {

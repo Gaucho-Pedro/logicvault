@@ -3,6 +3,7 @@ package org.artel.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.artel.dto.SignInDto;
 import org.artel.entity.Contractor;
 import org.artel.entity.LegalPerson;
 import org.artel.entity.NaturalPerson;
@@ -52,11 +53,11 @@ public class ContractorService {
         return contractorRepository.save(contractor);
     }
 
-    public boolean signInContractor(User user) {
-        User byUsername = userService.findByUsername(user.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username " + user.getUsername() + " not found"));
+    public boolean signInContractor(SignInDto signInDto) {
+        User byUsername = userService.findByUsername(signInDto.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username " + signInDto.getUsername() + " not found"));
         findByUserId(byUsername.getId());
-        return userService.signIn(user.getPassword(), byUsername.getPassword());
+        return userService.signIn(signInDto.getPassword(), byUsername.getPassword());
     }
 
     public Contractor setLegalStatus(Long id, LegalPerson legalPerson) {
