@@ -1,23 +1,28 @@
 package org.artel.service;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.artel.entity.Customer;
-import org.artel.entity.LegalPerson;
-import org.artel.entity.NaturalPerson;
-import org.artel.entity.User;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.artel.dto.SignInDto;
+import org.artel.entity.*;
 import org.artel.repository.CustomerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class CustomerService {
 
-    private final UserService userService;
-    private final CustomerRepository customerRepository;
+    UserService userService;
+    //    PortfolioService portfolioService;
+    CustomerRepository customerRepository;
 
     public List<Customer> getCustomers() {
         return customerRepository.findAll();
@@ -39,30 +44,32 @@ public class CustomerService {
         return customerRepository.findByUserId(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer with userId " + userId + " not found"));
     }
 
-    public User createCustomer(User newUser) {
-        if (userService.findByUsername(newUser.getUsername()) != null) {
-            User user = userService.addUser(newUser);
-            Customer customer = new Customer();
-            customer.setUserId(user.getId());
-            customerRepository.save(customer);
-            return newUser;
-        } else {
+    public Customer createCustomer(User newUser) {
+        if (userService.findByUsername(newUser.getUsername()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Username: " + newUser.getUsername() + " is already exist");
         }
+        var user = userService.addUser(newUser);
+        Customer customer = new Customer();
+        customer.setUser(user);
+        return customerRepository.save(customer);
     }
 
-    public boolean signInCustomer(User user) {
-        User byUsername = userService.findByUsername(user.getUsername());
+    public boolean signInCustomer(SignInDto signInDto) {
+        User byUsername = userService.findByUsername(signInDto.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username " + signInDto.getUsername() + " not found"));
         findByUserId(byUsername.getId());
-        return userService.signIn(user.getPassword(),byUsername.getPassword());
+        return userService.signIn(signInDto.getPassword(), byUsername.getPassword());
     }
 
     public Customer setLegalStatus(Long id, LegalPerson legalPerson) {
         Customer customer = findById(id);
         if (customer.getNaturalPerson() != null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a natural entity");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a natural person");
         }
-        legalPerson.setCustomer(customer);
+        if (customer.getLegalPerson() != null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a legal person");
+        }
+//        legalPerson.setCustomer(customer);
         customer.setLegalPerson(legalPerson);
         return customerRepository.save(customer);
     }
@@ -70,10 +77,27 @@ public class CustomerService {
     public Customer setNaturalStatus(Long id, NaturalPerson naturalPerson) {
         Customer customer = findById(id);
         if (customer.getLegalPerson() != null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a legal entity");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a legal person");
         }
-        naturalPerson.setCustomer(customer);
+        if (customer.getNaturalPerson() != null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer with id: " + id + " is already a natural person");
+        }
+//        naturalPerson.setCustomer(customer);
         customer.setNaturalPerson(naturalPerson);
         return customerRepository.save(customer);
+    }
+
+//    public Customer createPortfolioForCustomerById(Portfolio portfolio, Long customerId) {
+//        Customer customer = findById(customerId);
+//        customer.getPortfolios().add(portfolioService.createPortfolio(portfolio));
+//        return customerRepository.save(customer);
+//    }
+
+    public Set<Portfolio> getPortfoliosForCustomerById(Long customerId) {
+        return findById(customerId).getPortfolios();
+    }
+
+    public void deleteCustomerById(Long id) {
+        customerRepository.deleteById(id);
     }
 }

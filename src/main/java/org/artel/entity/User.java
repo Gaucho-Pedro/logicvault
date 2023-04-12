@@ -1,34 +1,41 @@
 package org.artel.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import java.util.Objects;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "art_user")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User /*implements UserDetails*/ {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Long id;
+    Long id;
 
     @Column(name = "username")
-    private String username;
+    String username;
 
     @Column(name = "password")
-    private String password;
+    String password;
 
     @Email
     @Column
-    private String email;
+    String email;
     //    @Pattern
     @Column(name = "phone_number")
-    private String phoneNumber;
+    String phoneNumber;
 
 /*    @ManyToOne
     @JoinColumn(name = "user_type")
@@ -61,4 +68,17 @@ public class User /*implements UserDetails*/ {
     public boolean isEnabled() {
         return false;
     }*/
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        User user = (User) o;
+        return getId() != null && Objects.equals(getId(), user.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

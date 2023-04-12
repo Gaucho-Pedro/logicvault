@@ -1,11 +1,17 @@
 package org.artel.controller;
 
+import io.swagger.annotations.Api;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.artel.dto.ContractorDto;
+import org.artel.dto.SignInDto;
 import org.artel.entity.Contractor;
 import org.artel.entity.LegalPerson;
 import org.artel.entity.NaturalPerson;
 import org.artel.entity.User;
 import org.artel.service.ContractorService;
+import org.artel.util.MappingUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +22,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/contractor")
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Api
 public class ContractorController {
 
-    private final ContractorService contractorService;
+    ContractorService contractorService;
+    MappingUtil mappingUtil;
 
     @GetMapping
-    public List<Contractor> getContractors() {
-        return contractorService.getContractors();
+    public ResponseEntity<List<ContractorDto>> getContractors() {
+        return ResponseEntity.ok(mappingUtil.toDtoList(contractorService.getContractors(), ContractorDto.class));
     }
 
     @GetMapping("/{id}")
@@ -35,25 +44,30 @@ public class ContractorController {
         return contractorService.findByUserId(userId);
     }
 
-    @PostMapping("/auth/register")
-    public ResponseEntity<?> createContractor(@Valid @RequestBody User user) {
-        return new ResponseEntity<>(contractorService.createContractor(user), HttpStatus.CREATED);
-    }
-
     @PostMapping("/{id}/legal")
-    public Contractor setLegalStatus(@PathVariable("id") Long id,
-                                     @Valid @RequestBody LegalPerson legalPerson) {
-        return contractorService.setLegalStatus(id, legalPerson);
+    public ContractorDto setLegalStatus(@PathVariable("id") Long id,
+                                        @Valid @RequestBody LegalPerson legalPerson) {
+        return mappingUtil.toDto(contractorService.setLegalStatus(id, legalPerson), ContractorDto.class);
     }
 
     @PostMapping("/{id}/natural")
-    public Contractor setNaturalStatus(@PathVariable("id") Long id,
-                                       @Valid @RequestBody NaturalPerson naturalPerson) {
-        return contractorService.setNaturalStatus(id, naturalPerson);
+    public ContractorDto setNaturalStatus(@PathVariable("id") Long id,
+                                          @Valid @RequestBody NaturalPerson naturalPerson) {
+        return mappingUtil.toDto(contractorService.setNaturalStatus(id, naturalPerson), ContractorDto.class);
+    }
+
+    @PostMapping("/auth/register")
+    public ResponseEntity<ContractorDto> createContractor(@Valid @RequestBody User user) {
+        return new ResponseEntity<>(mappingUtil.toDto(contractorService.createContractor(user), ContractorDto.class), HttpStatus.CREATED);
     }
 
     @PostMapping("/auth/signIn")
-    public ResponseEntity<?> signIn(@Valid @RequestBody User user) {
-        return contractorService.signInContractor(user) ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<?> signIn(@Valid @RequestBody SignInDto signInDto) {
+        return contractorService.signInContractor(signInDto) ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable("id") Long id) {
+        contractorService.deleteContractorById(id);
     }
 }
