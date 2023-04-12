@@ -44,14 +44,16 @@ public class CustomerService {
         return customerRepository.findByUserId(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer with userId " + userId + " not found"));
     }
 
-    public Customer createCustomer(User newUser) {
-        if (userService.findByUsername(newUser.getUsername()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Username: " + newUser.getUsername() + " is already exist");
+    public Customer createCustomer(Customer newCustomer) {
+        if (userService.findByUsername(newCustomer.getUser().getUsername()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Username: " + newCustomer.getUser().getUsername() + " is already exist");
         }
-        var user = userService.addUser(newUser);
-        Customer customer = new Customer();
-        customer.setUser(user);
-        return customerRepository.save(customer);
+        if (newCustomer.getLegalPerson() != null && newCustomer.getNaturalPerson() != null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer cannot be a legal person and an natural person at the same time");
+        }
+        var user = userService.addUser(newCustomer.getUser());
+        newCustomer.setUser(user);
+        return customerRepository.save(newCustomer);
     }
 
     public boolean signInCustomer(SignInDto signInDto) {

@@ -4,8 +4,12 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.artel.dto.CustomerDto;
+import org.artel.dto.RegisterDto;
 import org.artel.dto.SignInDto;
-import org.artel.entity.*;
+import org.artel.entity.Customer;
+import org.artel.entity.LegalPerson;
+import org.artel.entity.NaturalPerson;
+import org.artel.entity.Portfolio;
 import org.artel.service.CustomerService;
 import org.artel.util.MappingUtil;
 import org.springframework.http.HttpStatus;
@@ -54,8 +58,9 @@ public class CustomerController {
     }
 
     @PostMapping("/auth/register")
-    public ResponseEntity<CustomerDto> createCustomer(@Valid @RequestBody User user) {
-        return new ResponseEntity<>(mappingUtil.toDto(customerService.createCustomer(user), CustomerDto.class), HttpStatus.CREATED);
+    public ResponseEntity<CustomerDto> createCustomer(@Valid @RequestBody RegisterDto registerDto) {
+        return new ResponseEntity<>(mappingUtil.toDto(customerService.createCustomer(
+                mappingUtil.toEntity(registerDto, Customer.class)), CustomerDto.class), HttpStatus.CREATED);
     }
 
     @PostMapping("/auth/signIn")

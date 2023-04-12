@@ -5,11 +5,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.artel.dto.ContractorDto;
+import org.artel.dto.RegisterDto;
 import org.artel.dto.SignInDto;
 import org.artel.entity.Contractor;
 import org.artel.entity.LegalPerson;
 import org.artel.entity.NaturalPerson;
-import org.artel.entity.User;
 import org.artel.service.ContractorService;
 import org.artel.util.MappingUtil;
 import org.springframework.http.HttpStatus;
@@ -57,8 +57,9 @@ public class ContractorController {
     }
 
     @PostMapping("/auth/register")
-    public ResponseEntity<ContractorDto> createContractor(@Valid @RequestBody User user) {
-        return new ResponseEntity<>(mappingUtil.toDto(contractorService.createContractor(user), ContractorDto.class), HttpStatus.CREATED);
+    public ResponseEntity<ContractorDto> createContractor(@Valid @RequestBody RegisterDto registerDto) {
+        return new ResponseEntity<>(mappingUtil.toDto(contractorService.createContractor(
+                mappingUtil.toEntity(registerDto, Contractor.class)), ContractorDto.class), HttpStatus.CREATED);
     }
 
     @PostMapping("/auth/signIn")

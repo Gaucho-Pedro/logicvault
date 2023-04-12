@@ -43,14 +43,16 @@ public class ContractorService {
         return contractorRepository.findByUserId(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contractor with userId " + userId + " not found"));
     }
 
-    public Contractor createContractor(User newUser) {
-        if (userService.findByUsername(newUser.getUsername()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Username: " + newUser.getUsername() + " is already exist");
+    public Contractor createContractor(Contractor newContractor) {
+        if (userService.findByUsername(newContractor.getUser().getUsername()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Username: " + newContractor.getUser().getUsername() + " is already exist");
         }
-        var user = userService.addUser(newUser);
-        Contractor contractor = new Contractor();
-        contractor.setUser(user);
-        return contractorRepository.save(contractor);
+        if (newContractor.getLegalPerson() != null && newContractor.getNaturalPerson() != null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Contractor cannot be a legal person and an natural person at the same time");
+        }
+        var user = userService.addUser(newContractor.getUser());
+        newContractor.setUser(user);
+        return contractorRepository.save(newContractor);
     }
 
     public boolean signInContractor(SignInDto signInDto) {
