@@ -31,7 +31,7 @@ public class CustomerController {
 
     @GetMapping
     public ResponseEntity<List<CustomerDto>> getCustomers() {
-        return ResponseEntity.ok(mappingUtil.toDtoList(customerService.getCustomers(), CustomerDto.class));
+        return ResponseEntity.ok(mappingUtil.toDtoList(customerService.findAll(), CustomerDto.class));
     }
 
     @GetMapping("/{id}")
@@ -59,18 +59,18 @@ public class CustomerController {
 
     @PostMapping("/auth/register")
     public ResponseEntity<CustomerDto> createCustomer(@Valid @RequestBody RegisterDto registerDto) {
-        return new ResponseEntity<>(mappingUtil.toDto(customerService.createCustomer(
+        return new ResponseEntity<>(mappingUtil.toDto(customerService.create(
                 mappingUtil.toEntity(registerDto, Customer.class)), CustomerDto.class), HttpStatus.CREATED);
     }
 
     @PostMapping("/auth/signIn")
     public ResponseEntity<?> signIn(@Valid @RequestBody SignInDto signInDto) {
-        return customerService.signInCustomer(signInDto) ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        return customerService.signIn(signInDto) ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable("id") Long id) {
-        customerService.deleteCustomerById(id);
+        customerService.delete(id);
     }
 
 //    @PostMapping("/{id}/portfolio")

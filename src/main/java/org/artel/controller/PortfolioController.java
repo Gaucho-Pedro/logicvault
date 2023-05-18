@@ -22,11 +22,12 @@ public class PortfolioController {
     PortfolioService portfolioService;
     MappingUtil mappingUtil;
 
-    @PostMapping("/customer/{id}")
-    public ResponseEntity<Portfolio> createPortfolioForCustomerById(@PathVariable("id") Long id, @RequestBody Portfolio portfolio) {
+    @PostMapping/*("/customer/{id}")*/
+    public ResponseEntity<PortfolioDto> createPortfolio(/*@PathVariable("id") Long id,*/ @RequestBody PortfolioDto portfolio) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(portfolioService.createPortfolioForCustomerById(portfolio, id));
+                .body(mappingUtil.toDto(portfolioService.create(
+                        mappingUtil.toEntity(portfolio, Portfolio.class)), PortfolioDto.class));
     }
 
     @GetMapping("/{id}")
@@ -36,17 +37,25 @@ public class PortfolioController {
 
     @GetMapping
     public ResponseEntity<List<PortfolioDto>> getPortfolios() {
-        return ResponseEntity.ok(mappingUtil.toDtoList(portfolioService.getPortfolios(), PortfolioDto.class));
+        return ResponseEntity.ok(
+                mappingUtil.toDtoList(portfolioService.findAll(), PortfolioDto.class));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Portfolio> updatePortfolio(@PathVariable("id") Long id, @RequestBody Portfolio portfolio) {
-        return ResponseEntity.ok(portfolioService.updatePortfolio(portfolio, id));
+    public ResponseEntity<PortfolioDto> updateOrCreatePortfolio(@RequestBody PortfolioDto portfolio, @PathVariable("id") Long id) {
+        return ResponseEntity.ok(
+                mappingUtil.toDto(portfolioService.update(mappingUtil.toEntity(portfolio, Portfolio.class), id), PortfolioDto.class));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<PortfolioDto> updatePortfolio(@RequestBody PortfolioDto portfolio, @PathVariable("id") Long id) {
+        return ResponseEntity.ok(
+                mappingUtil.toDto(portfolioService.updatePartial(mappingUtil.toEntity(portfolio, Portfolio.class), id), PortfolioDto.class));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePortfolioById(@PathVariable("id") Long id) {
-        portfolioService.deletePortfolioById(id);
+        portfolioService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

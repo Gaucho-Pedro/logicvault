@@ -1,6 +1,5 @@
 package org.artel.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,34 +23,48 @@ public class Portfolio {
     @Column(name = "id", nullable = false)
     Long id;
 
-    @Column(name = "description", columnDefinition = "TEXT")
+    @Column(name = "description"/*, columnDefinition = "TEXT"*/)
     String description;
 
     @Column(name = "score1")
-    int score1;
+    Integer score1;
 
     @Column(name = "score2")
-    int score2;
+    Integer score2;
 
     @Column(name = "score3")
-    int score3;
+    Integer score3;
 
-    @Column(name = "showreel_tags", columnDefinition = "TEXT")
+    @Column(name = "showreel_tags"/*, columnDefinition = "TEXT"*/)
     String showreelTags;
 
-    //    @ManyToMany
-//    @JoinTable(
-//            name = "art_portfolio_activity",
-//            joinColumns = @JoinColumn(name = "portfolio_id"),
-//            inverseJoinColumns = @JoinColumn(name = "activity_id"))
-//    private Set<ActivityType> activityTypes;
+    @ManyToOne
+    @JoinColumn(name = "grade_id")
+    Grade grade;
+
+    @Column(name = "payment_per_hour")
+    Long paymentPerHour;
+
+    @Column(name = "payment_per_day")
+    Long paymentPerDay;
+
+    @Column(name = "payment_per_month")
+    Long paymentPerMonth;
+
+    @Column(name = "payment_per_project")
+    Long paymentPerProject;
+
+    @OneToOne
+    @JoinColumn(name = "payment_currency_id", referencedColumnName = "id")
+    Currency currency;
+
     @ManyToOne
     @JoinColumn(name = "activity_type_id")
     ActivityType activityType;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    @JsonIgnore
+//    @JsonIgnore
     Customer customer;
 
     @ManyToMany
@@ -60,6 +73,17 @@ public class Portfolio {
             joinColumns = @JoinColumn(name = "portfolio_id"),
             inverseJoinColumns = @JoinColumn(name = "software_id"))
     Set<Software> software = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "art_portfolio_occupation",
+            joinColumns = @JoinColumn(name = "portfolio_id"),
+            inverseJoinColumns = @JoinColumn(name = "occupation_id"))
+    Set<Occupation> occupation = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "portfolio_id", referencedColumnName = "id")
+    Set<MediaData> mediaData = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

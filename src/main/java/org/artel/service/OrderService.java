@@ -20,7 +20,7 @@ public class OrderService {
     ContractorService contractorService;
     OrderRepository orderRepository;
 
-    public List<Order> getOrders() {
+    public List<Order> findAll() {
         return orderRepository.findAll();
     }
 
@@ -28,13 +28,13 @@ public class OrderService {
         return orderRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order with id " + id + " not found"));
     }
 
-    public Order createOrderForContractorById(Order order, Long contractorId) {
+    public Order createByContractorId(Order order, Long contractorId) {
         Contractor contractor = contractorService.findById(contractorId);
         order.setContractor(contractor);
         return orderRepository.save(order);
     }
 
-    public Order updateOrder(Order newOrder, Long id) {
+    public Order update(Order newOrder, Long id) {
         Order order = findById(id);
 
         order.setDescription(newOrder.getDescription());
@@ -44,7 +44,7 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public void deleteOrderById(Long id) {
+    public void delete(Long id) {
         orderRepository.deleteById(id);
     }
 }

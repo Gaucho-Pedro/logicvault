@@ -21,7 +21,7 @@ public class OrderController {
     public ResponseEntity<Order> createOrderForContractorById(@PathVariable("id") Long id, @RequestBody Order order) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(orderService.createOrderForContractorById(order, id));
+                .body(orderService.createByContractorId(order, id));
     }
 
     @GetMapping("/{id}")
@@ -31,12 +31,12 @@ public class OrderController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Order> updateOrder(@PathVariable("id") Long id, @RequestBody Order order) {
-        return ResponseEntity.ok(orderService.updateOrder(order, id));
+        return ResponseEntity.ok(orderService.update(order, id));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOrderById(@PathVariable("id") Long id) {
-        orderService.deleteOrderById(id);
+        orderService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

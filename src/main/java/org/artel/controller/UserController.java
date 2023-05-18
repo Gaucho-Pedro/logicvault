@@ -26,6 +26,6 @@ public class UserController {
 
     @PatchMapping
     public ResponseEntity<UserDto> changeUser(@RequestBody UserDto userDto) {
-        return ResponseEntity.ok(mappingUtil.toDto(userService.changeUser(mappingUtil.toEntity(userDto, User.class)), UserDto.class));
+        return ResponseEntity.ok(mappingUtil.toDto(userService.update(mappingUtil.toEntity(userDto, User.class)), UserDto.class));
     }
 }

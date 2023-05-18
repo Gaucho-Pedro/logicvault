@@ -21,7 +21,7 @@ public class UserService {
     UserRepository userRepository;
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public List<User> getUsers() {
+    public List<User> findAll() {
         return userRepository.findAll();
     }
 
@@ -33,12 +33,12 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    public User addUser(User newUser) {
+    public User create(User newUser) {
         newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
         return userRepository.save(newUser);
     }
 
-    public User changeUser(User newUser) {
+    public User update(User newUser) {
         var user = findById(newUser.getId());
 
         if (newUser.getEmail() != null) {

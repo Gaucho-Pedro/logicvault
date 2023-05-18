@@ -24,15 +24,15 @@ public class CustomerService {
     //    PortfolioService portfolioService;
     CustomerRepository customerRepository;
 
-    public List<Customer> getCustomers() {
+    public List<Customer> findAll() {
         return customerRepository.findAll();
     }
 
-    public List<Customer> getCustomersWhichAreLegalPerson() {
+    public List<Customer> findCustomersWhichAreLegalPerson() {
         return customerRepository.findByLegalPersonNotNullAndNaturalPersonNull();
     }
 
-    public List<Customer> getCustomersWhichAreNaturalPerson() {
+    public List<Customer> findCustomersWhichAreNaturalPerson() {
         return customerRepository.findByNaturalPersonNotNullAndLegalPersonNull();
     }
 
@@ -44,19 +44,19 @@ public class CustomerService {
         return customerRepository.findByUserId(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer with userId " + userId + " not found"));
     }
 
-    public Customer createCustomer(Customer newCustomer) {
+    public Customer create(Customer newCustomer) {
         if (userService.findByUsername(newCustomer.getUser().getUsername()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Username: " + newCustomer.getUser().getUsername() + " is already exist");
         }
         if (newCustomer.getLegalPerson() != null && newCustomer.getNaturalPerson() != null) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Customer cannot be a legal person and an natural person at the same time");
         }
-        var user = userService.addUser(newCustomer.getUser());
+        var user = userService.create(newCustomer.getUser());
         newCustomer.setUser(user);
         return customerRepository.save(newCustomer);
     }
 
-    public boolean signInCustomer(SignInDto signInDto) {
+    public boolean signIn(SignInDto signInDto) {
         User byUsername = userService.findByUsername(signInDto.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username " + signInDto.getUsername() + " not found"));
         findByUserId(byUsername.getId());
@@ -99,7 +99,7 @@ public class CustomerService {
         return findById(customerId).getPortfolios();
     }
 
-    public void deleteCustomerById(Long id) {
+    public void delete(Long id) {
         customerRepository.deleteById(id);
     }
 }

@@ -23,15 +23,15 @@ public class ContractorService {
     UserService userService;
     ContractorRepository contractorRepository;
 
-    public List<Contractor> getContractors() {
+    public List<Contractor> findAll() {
         return contractorRepository.findAll();
     }
 
-    public List<Contractor> getContractorsWhichAreLegalPerson() {
+    public List<Contractor> findContractorsWhichAreLegalPerson() {
         return contractorRepository.findByLegalPersonNotNullAndNaturalPersonNull();
     }
 
-    public List<Contractor> getContractorsWhichAreNaturalPerson() {
+    public List<Contractor> findContractorsWhichAreNaturalPerson() {
         return contractorRepository.findByNaturalPersonNotNullAndLegalPersonNull();
     }
 
@@ -43,19 +43,19 @@ public class ContractorService {
         return contractorRepository.findByUserId(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contractor with userId " + userId + " not found"));
     }
 
-    public Contractor createContractor(Contractor newContractor) {
+    public Contractor create(Contractor newContractor) {
         if (userService.findByUsername(newContractor.getUser().getUsername()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Username: " + newContractor.getUser().getUsername() + " is already exist");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username: " + newContractor.getUser().getUsername() + " is already exist");
         }
         if (newContractor.getLegalPerson() != null && newContractor.getNaturalPerson() != null) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Contractor cannot be a legal person and an natural person at the same time");
         }
-        var user = userService.addUser(newContractor.getUser());
+        var user = userService.create(newContractor.getUser());
         newContractor.setUser(user);
         return contractorRepository.save(newContractor);
     }
 
-    public boolean signInContractor(SignInDto signInDto) {
+    public boolean signIn(SignInDto signInDto) {
         User byUsername = userService.findByUsername(signInDto.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username " + signInDto.getUsername() + " not found"));
         findByUserId(byUsername.getId());
@@ -88,7 +88,7 @@ public class ContractorService {
         return contractorRepository.save(contractor);
     }
 
-    public void deleteContractorById(Long id) {
+    public void delete(Long id) {
         contractorRepository.deleteById(id);
     }
 }
